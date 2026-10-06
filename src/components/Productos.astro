@@ -1,0 +1,61 @@
+---
+import ProductCard from './ProductCard.astro';
+import { productos } from '../data/productos';
+---
+
+<section id="productos" class="productos container">
+  <div class="head">
+    <div class="title">
+      <span class="hand kicker">De la finca a tu despensa</span>
+      <h2 class="display">Nuestros productos</h2>
+    </div>
+    <p>
+      Todo sin aditivos ni conservantes. Valor por unidad (c/u): de 6 a 12 o desde 13 unidades, el precio baja.
+    </p>
+  </div>
+
+  <div class="grid">
+    {productos.map((p) => <ProductCard producto={p} />)}
+  </div>
+</section>
+
+<style>
+  .productos {
+    padding-block: 48px 120px;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+  .title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .kicker {
+    font-size: 32px;
+    color: var(--purple);
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(46px, 6vw, 88px);
+    line-height: 1;
+  }
+  .head p {
+    margin: 0;
+    max-width: 360px;
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 700;
+    color: #4a2a52;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+    gap: 22px;
+  }
+</style>

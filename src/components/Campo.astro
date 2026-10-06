@@ -1,0 +1,90 @@
+---
+import Polaroid from './Polaroid.astro';
+
+const fotos = [
+  { src: '/images/acopio1.jpg', alt: 'Chontaduro rojo y amarillo en canastas del centro de acopio', caption: 'Cosecha y recolección', rotate: -2.5, aspect: '1/1' },
+  { src: '/images/acopio2.jpg', alt: 'Mujer seleccionando chontaduro en una mesa del galpón', caption: 'Limpieza, cargue y despacho', rotate: 2, aspect: '1/1', down: true },
+  { src: '/images/brote.jpg', alt: 'Brote de palma de chontaduro creciendo en la tierra', caption: 'Una palma que empieza', rotate: -1.5, aspect: '1/1' },
+];
+---
+
+<section id="campo" class="campo">
+  <div class="container inner">
+    <div class="intro">
+      <div class="title">
+        <span class="hand kicker">Entre dos cordilleras</span>
+        <h2 class="display">Donde el viento hace el sabor</h2>
+      </div>
+      <p>
+        Los vientos cálidos que suben del Valle del Patía se mezclan con las corrientes frías del Cerro de Munchique y
+        de los volcanes Puracé y Sotará. Ese remolino de vientos influye en la calidad del fruto y le da a este
+        chontaduro su sabor único.
+      </p>
+    </div>
+
+    <div class="fotos">
+      {fotos.map((f) => <div class:list={['foto', { down: f.down }]}><Polaroid src={f.src} alt={f.alt} caption={f.caption} rotate={f.rotate} aspect={f.aspect} /></div>)}
+    </div>
+
+    <p class="hand nota">
+      Cada agosto, Cuatro Esquinas celebra el Reinado y las Ferias del Chontaduro: una tradición vibrante para toda la
+      comunidad.
+    </p>
+  </div>
+</section>
+
+<style>
+  .campo {
+    background: var(--kraft);
+    padding-block: 104px;
+  }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+  .intro {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+    gap: 48px;
+    align-items: end;
+  }
+  .title {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .kicker {
+    font-size: 32px;
+    color: var(--purple);
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(42px, 5.4vw, 80px);
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .intro p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.8;
+    font-weight: 600;
+    color: #3a2040;
+  }
+  .fotos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    gap: 36px 28px;
+    padding-inline: 8px;
+  }
+  .foto.down {
+    margin-top: 20px;
+  }
+  .nota {
+    margin: 0;
+    max-width: 760px;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.2;
+    color: var(--purple);
+  }
+</style>

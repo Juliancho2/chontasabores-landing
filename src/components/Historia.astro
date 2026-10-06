@@ -1,0 +1,156 @@
+---
+const hitos = [
+  {
+    year: '1950',
+    dot: 'var(--coral)',
+    text: 'Gonzalo Dulcey e Ismael Zambrano traen las primeras palmas a Cuatro Esquinas. Se cultivaba para el consumo familiar.',
+  },
+  {
+    year: '1970',
+    dot: 'var(--orange)',
+    text: 'Los primeros bultos de chontaduro comienzan a comercializarse en Popayán. Un bulto “tres rayas” se vendía por solo $200 pesos.',
+  },
+  {
+    year: 'Hoy',
+    dot: 'var(--coral)',
+    text: 'El chontaduro de Cuatro Esquinas llega a mercados internacionales en salmuera, harina, almíbares y mermeladas.',
+  },
+];
+---
+
+<svg class="wave top" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0,40 C180,0 360,80 540,40 S900,0 1080,40 S1320,70 1440,30 L1440,80 L0,80 Z" fill="#3F1E6D"></path>
+</svg>
+
+<section id="historia" class="historia">
+  <div class="container inner">
+    <div class="texto">
+      <span class="hand kicker">Nuestra historia</span>
+      <h2 class="display">Nació en el campo, entre el esfuerzo y la tradición de una familia</h2>
+      <p>
+        Durante años cultivamos el <strong>chontaduro</strong> con pasión, pero notamos que en el mercado no existían
+        productos innovadores para disfrutarlo de una manera diferente.
+      </p>
+      <p>
+        Fue entonces cuando decidimos transformar esta joya natural en mermeladas, almíbares, harinas y otros productos
+        únicos. Hoy seguimos creciendo, compartiendo con orgullo el fruto de nuestra tierra y el amor por lo que
+        hacemos.
+      </p>
+    </div>
+
+    <ol class="timeline">
+      {
+        hitos.map((h, i) => (
+          <li class={i === hitos.length - 1 ? 'last' : ''}>
+            <div class="rail">
+              <span class="dot" style={`background:${h.dot}`} />
+              <span class="line" />
+            </div>
+            <div>
+              <div class="year display">{h.year}</div>
+              <p>{h.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<svg class="wave bottom" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0,40 C240,80 420,0 720,40 S1200,80 1440,30 L1440,80 L0,80 Z" fill="#3F1E6D"></path>
+</svg>
+
+<style>
+  .wave {
+    display: block;
+    width: 100%;
+    height: 64px;
+  }
+  .top {
+    margin-bottom: -1px;
+  }
+  .bottom {
+    margin-top: -1px;
+    transform: scaleY(-1);
+  }
+  .historia {
+    background: var(--purple);
+    color: var(--paper);
+    padding-block: 56px 112px;
+  }
+  .inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    gap: 72px;
+    align-items: start;
+  }
+  .texto {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+  .kicker {
+    font-size: 32px;
+    color: var(--orange);
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(38px, 4.6vw, 66px);
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+  .texto p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.8;
+    font-weight: 600;
+    color: rgba(246, 236, 218, 0.88);
+  }
+  strong {
+    color: var(--orange);
+  }
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0 0;
+  }
+  .timeline li {
+    display: flex;
+    gap: 24px;
+    padding-bottom: 36px;
+  }
+  .timeline li.last {
+    padding-bottom: 0;
+  }
+  .rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+  }
+  .line {
+    flex: 1;
+    border-left: 3px dotted rgba(246, 236, 218, 0.45);
+    margin-top: 6px;
+  }
+  .last .line {
+    display: none;
+  }
+  .year {
+    font-size: 44px;
+    line-height: 1;
+    color: var(--orange);
+  }
+  .timeline p {
+    margin: 10px 0 0;
+    font-size: 17px;
+    line-height: 1.65;
+    font-weight: 600;
+  }
+</style>

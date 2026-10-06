@@ -1,0 +1,95 @@
+---
+import { site, whatsappUrl, mailUrl } from '../data/site';
+---
+
+<footer id="contacto" class="contacto">
+  <div class="container inner">
+    <div class="top">
+      <div class="title">
+        <span class="hand kicker">Te esperamos</span>
+        <h2 class="display">¡Haz tu pedido hoy mismo!</h2>
+      </div>
+      <div class="datos">
+        <a class="btn phone" href={whatsappUrl}>{site.phoneDisplay}</a>
+        <a class="mail" href={mailUrl}>{site.email}</a>
+      </div>
+    </div>
+    <div class="bottom">
+      <span class="display brand">{site.name}</span>
+      <span class="tag">{site.tagline}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .contacto {
+    background: var(--coral);
+    color: var(--ink);
+    padding-block: 96px 40px;
+  }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+  }
+  .title {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 760px;
+  }
+  .kicker {
+    font-size: 34px;
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(46px, 6.4vw, 96px);
+    line-height: 1;
+  }
+  .datos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .phone {
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 22px;
+    min-height: 66px;
+    padding: 0 38px;
+    box-shadow: 0 4px 0 rgba(42, 18, 48, 0.5);
+  }
+  .mail {
+    font-weight: 800;
+    font-size: 17px;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    padding: 12px 4px;
+  }
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border-top: 2px dashed rgba(42, 18, 48, 0.5);
+    padding-top: 26px;
+  }
+  .brand {
+    font-size: 26px;
+  }
+  .tag {
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+</style>

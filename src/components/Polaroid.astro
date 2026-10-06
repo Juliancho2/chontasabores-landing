@@ -1,0 +1,42 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  caption: string;
+  rotate?: number; // grados
+  aspect?: string; // ej. "1/1" o "4/3"
+}
+
+const { src, alt, caption, rotate = 0, aspect = '1/1' } = Astro.props;
+---
+
+<figure class="polaroid" style={`--rot:${rotate}deg; --aspect:${aspect}`}>
+  <img src={src} alt={alt} loading="lazy" />
+  <figcaption class="hand">{caption}</figcaption>
+</figure>
+
+<style>
+  .polaroid {
+    margin: 0;
+    background: var(--card);
+    padding: 12px 12px 14px;
+    box-shadow: 0 10px 24px rgba(42, 18, 48, 0.22);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transform: rotate(var(--rot));
+  }
+  img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--aspect);
+    object-fit: cover;
+    display: block;
+  }
+  figcaption {
+    font-size: 25px;
+    line-height: 1;
+    text-align: center;
+    color: var(--ink);
+  }
+</style>

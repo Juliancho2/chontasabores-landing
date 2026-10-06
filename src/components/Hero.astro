@@ -1,0 +1,167 @@
+---
+import Polaroid from "./Polaroid.astro";
+import { whatsappUrl } from "../data/site";
+
+const col1 = [
+  {
+    src: "/images/trabajo1.jpg",
+    alt: "Recolector subido a la palma de chontaduro",
+    caption: "A pulso, en la palma",
+    rotate: -3.5,
+  },
+  {
+    src: "/images/mula.jpg",
+    alt: "Mula cargada de chontaduro por un camino de montaña",
+    caption: "Camino a la planta",
+    rotate: 2.5,
+  },
+];
+const col2 = [
+  {
+    src: "/images/campesino.jpg",
+    alt: "Campesino junto a su caballo cargado de chontaduro",
+    caption: "Gente de la tierra",
+    rotate: 3,
+  },
+  {
+    src: "/images/trabajo2.jpg",
+    alt: "Dos cosechadores sonriendo en el cultivo",
+    caption: "Cosecha en familia",
+    rotate: -2,
+  },
+];
+---
+
+<section id="inicio" class="hero container">
+  <div class="copy">
+    <span class="hand saludo">¡Bienvenidos a nuestra historia!</span>
+    <h1 class="display">
+      El fruto de <span class="wavy">nuestra tierra</span>, en tu mesa
+    </h1>
+    <p>
+      Mermelada, almíbar, salmuera y harina de chontaduro. Cultivado, cosechado
+      y transformado por una familia del campo, con el respeto de siempre por
+      nuestro entorno.
+    </p>
+    <div class="actions">
+      <a class="btn primary" href={whatsappUrl}>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"
+          ></path>
+        </svg>
+        Haz tu pedido
+      </a>
+      <a class="btn secondary" href="#productos">Ver la despensa</a>
+    </div>
+  </div>
+
+  <div class="collage">
+    <div class="sun" aria-hidden="true"></div>
+    <div class="grid">
+      <div class="col">
+        {col1.map((p) => <Polaroid {...p} />)}
+      </div>
+      <div class="col offset">
+        {col2.map((p) => <Polaroid {...p} />)}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: 64px 96px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr));
+    gap: 56px;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .copy {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .saludo {
+    font-size: 34px;
+    color: var(--purple);
+    transform: rotate(-2deg);
+    display: inline-block;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(46px, 6.2vw, 92px);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .wavy {
+    text-decoration: underline wavy var(--orange);
+    text-decoration-thickness: 4px;
+    text-underline-offset: 10px;
+  }
+  p {
+    margin: 0;
+    max-width: 500px;
+    font-size: 19px;
+    line-height: 1.7;
+    font-weight: 600;
+    color: #4a2a52;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .primary {
+    background: var(--coral);
+    color: var(--ink);
+  }
+  .secondary {
+    background: var(--card);
+    color: var(--ink);
+  }
+  .collage {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    justify-self: center;
+  }
+  .sun {
+    position: absolute;
+    right: -6%;
+    top: -8%;
+    width: 62%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: var(--orange);
+  }
+  .grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    padding: 8px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .offset {
+    margin-top: 56px;
+  }
+</style>
