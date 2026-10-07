@@ -321,4 +321,13 @@ const links = [
       transition: none !important;
     }
   }
+  /* Laptop / pantallas bajas: header mas compacto para que el hero quepa */
+  @media (min-width: 761px) and (max-height: 800px) {
+    .inner {
+      padding-block: 12px 8px;
+    }
+    .logo img {
+      height: 60px;
+    }
+  }
 </style>
