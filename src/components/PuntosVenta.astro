@@ -94,7 +94,7 @@ const icons: Record<string, string> = {
     position: relative;
     isolation: isolate;
     color: var(--paper);
-    padding-block: 104px;
+    padding-block: 72px;
     background:
       radial-gradient(58% 52% at 90% 100%, rgba(247, 135, 69, 0.4), transparent 70%),
       radial-gradient(46% 38% at 0% 0%, rgba(240, 76, 67, 0.24), transparent 72%),
@@ -112,14 +112,14 @@ const icons: Record<string, string> = {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 56px;
+    gap: 40px;
   }
   .head {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 26px;
+    gap: 20px;
   }
   .title {
     display: flex;
@@ -128,7 +128,7 @@ const icons: Record<string, string> = {
     max-width: 800px;
   }
   .kicker {
-    font-size: 26px;
+    font-size: 21px;
     color: var(--orange);
     transform: rotate(-1.4deg);
     transform-origin: left center;
@@ -136,7 +136,7 @@ const icons: Record<string, string> = {
   }
   h2 {
     margin: 0;
-    font-size: clamp(34px, 4.6vw, 68px);
+    font-size: clamp(30px, 3.6vw, 52px);
     line-height: 1;
     text-wrap: balance;
   }
@@ -157,7 +157,7 @@ const icons: Record<string, string> = {
   .cols {
     display: grid;
     grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-    gap: 44px;
+    gap: 34px;
     align-items: start;
   }
 
@@ -178,7 +178,7 @@ const icons: Record<string, string> = {
     color: var(--ink);
     border: 2.5px dashed rgba(42, 18, 48, 0.42);
     border-radius: 26px;
-    padding: 20px 24px;
+    padding: 18px 20px;
     box-shadow: 0 7px 0 rgba(16, 6, 26, 0.45);
     transition:
       transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -211,7 +211,7 @@ const icons: Record<string, string> = {
   }
   .cuerpo h3 {
     margin: 0;
-    font-size: clamp(20px, 1.7vw, 23px);
+    font-size: clamp(17px, 1.35vw, 20px);
     line-height: 1.05;
   }
   .dato {
@@ -251,7 +251,7 @@ const icons: Record<string, string> = {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 26px;
+    gap: 20px;
   }
   .cartel {
     position: relative;
@@ -263,7 +263,7 @@ const icons: Record<string, string> = {
     color: var(--paper);
     border: 2.5px dashed rgba(246, 236, 218, 0.5);
     border-radius: 26px;
-    padding: 26px 26px 30px;
+    padding: 22px 22px 26px;
     box-shadow: 0 7px 0 rgba(8, 2, 16, 0.6);
   }
   .cartel::before {
@@ -280,7 +280,7 @@ const icons: Record<string, string> = {
   }
   .cartel__t {
     align-self: flex-start;
-    font-size: clamp(26px, 2.4vw, 31px);
+    font-size: clamp(22px, 1.9vw, 26px);
     line-height: 1;
     color: var(--orange);
     transform: rotate(-1.5deg);
@@ -322,7 +322,7 @@ const icons: Record<string, string> = {
   }
   .apoya {
     margin: 0;
-    font-size: clamp(26px, 2.4vw, 34px);
+    font-size: clamp(21px, 1.9vw, 27px);
     line-height: 1.12;
     color: var(--orange);
     transform: rotate(-1deg);
@@ -364,13 +364,13 @@ const icons: Record<string, string> = {
 
   @media (max-width: 760px) {
     .puntos {
-      padding-block: 80px;
+      padding-block: 56px;
     }
     .inner {
       gap: 42px;
     }
     .kicker {
-      font-size: 22px;
+      font-size: 19px;
     }
     .head > p {
       max-width: none;
