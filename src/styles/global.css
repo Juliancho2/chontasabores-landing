@@ -84,7 +84,7 @@ html.js-anim [data-fx] {
   padding: 0 30px;
   border-radius: 16px;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 15px;
   box-shadow: 0 4px 0 rgba(42, 18, 48, 0.9);
   transition: transform 0.2s;
 }
