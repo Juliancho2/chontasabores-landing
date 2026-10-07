@@ -17,8 +17,25 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      // Oculta los elementos animados antes del primer pintado
+      // (solo si el usuario no pidió reducir el movimiento).
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('js-anim');
+        window.__fxFallback = window.setTimeout(function () {
+          // Respaldo: si el script de animaciones no arrancó, todo vuelve a verse.
+          if (window.__fxStarted) return;
+          document.documentElement.classList.remove('js-anim');
+          document.querySelectorAll('[data-fx]').forEach(function (el) {
+            el.style.removeProperty('opacity');
+          });
+        }, 4000);
+      }
+    </script>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#3f1e6d" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -32,5 +49,8 @@ const {
   </head>
   <body>
     <slot />
+    <script>
+      import '../scripts/animations';
+    </script>
   </body>
 </html>

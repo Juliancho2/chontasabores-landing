@@ -1,39 +1,107 @@
 ---
+import WhatsappIcon from './WhatsappIcon.astro';
 import { whatsappUrl } from '../data/site';
 
 const links = [
   { href: '#historia', label: 'Nuestra historia' },
   { href: '#productos', label: 'Productos' },
+  { href: '#puntos', label: 'Dónde comprar' },
   { href: '#campo', label: 'El campo' },
   { href: '#maquila', label: 'Maquila' },
 ];
 ---
 
-<header class="header container">
-  <a href="#inicio" class="logo display" aria-label="Chonta Sabores, inicio">
-    Chonta <span>Sabores</span>
-  </a>
-  <nav class="links" aria-label="Principal">
-    {links.map((l) => <a href={l.href}>{l.label}</a>)}
-  </nav>
-  <a class="btn cta" href={whatsappUrl}>Pedir por WhatsApp</a>
+<header class="header">
+  <div class="container inner">
+    <a href="#inicio" class="logo" data-fx="down" aria-label="Chonta Sabores, inicio">
+      <img src="/images/logo.png" alt="Chonta Sabores" width="115" height="72" />
+    </a>
+    <nav class="links" aria-label="Principal">
+      {links.map((l) => <a href={l.href} data-fx="down">{l.label}</a>)}
+    </nav>
+    <a class="btn cta" href={whatsappUrl} target="_blank" rel="noopener noreferrer" data-fx="down"><WhatsappIcon size={18} />Pedir por WhatsApp</a>
+
+    <button class="burger" type="button" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <div class="panel" id="menu-movil">
+    <div class="container panel__inner">
+      <span class="panel__kicker hand">Menú</span>
+      <nav class="panel__links" aria-label="Navegación móvil">
+        {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      </nav>
+      <a class="btn panel__cta" href={whatsappUrl} target="_blank" rel="noopener noreferrer"><WhatsappIcon size={20} />Pedir por WhatsApp</a>
+    </div>
+  </div>
 </header>
+
+<script>
+  // El header pasa a "pegado" cuando la franja superior sale de la vista
+  // y controla el menú hamburguesa en móvil.
+  const header = document.querySelector<HTMLElement>('.header');
+  const franja = document.querySelector('.franja');
+  const burger = document.querySelector<HTMLButtonElement>('.burger');
+  const panel = document.querySelector<HTMLElement>('.panel');
+
+  if (header && franja && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => {
+      header.classList.toggle('is-stuck', !entry.isIntersecting);
+    }).observe(franja);
+  }
+
+  if (header && burger && panel) {
+    const setOpen = (open: boolean) => {
+      header.classList.toggle('menu-open', open);
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      document.body.classList.toggle('menu-bloqueado', open);
+    };
+
+    burger.addEventListener('click', () => setOpen(!header.classList.contains('menu-open')));
+    panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 760) setOpen(false);
+    });
+  }
+</script>
 
 <style>
   .header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: var(--paper);
+    transition: box-shadow 0.3s ease;
+  }
+  .header.is-stuck {
+    box-shadow: 0 14px 34px rgba(42, 18, 48, 0.16);
+  }
+  .inner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    padding-top: 22px;
+    padding-block: 18px 12px;
   }
   .logo {
-    font-size: 30px;
-    color: var(--ink);
+    display: block;
+    line-height: 0;
   }
-  .logo span {
-    color: var(--coral);
+  .logo img {
+    height: 72px;
+    width: auto;
+    transition: transform 0.25s;
+  }
+  .logo:hover img {
+    transform: rotate(-3deg) scale(1.04);
   }
   .links {
     display: flex;
@@ -44,9 +112,26 @@ const links = [
     font-weight: 700;
     font-size: 16px;
     padding: 14px 6px;
+    position: relative;
+  }
+  .links a::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 8px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--coral);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.3s ease;
   }
   .links a:hover {
     color: var(--coral);
+  }
+  .links a:hover::after {
+    transform: scaleX(1);
   }
   .cta {
     background: var(--orange);
@@ -55,9 +140,185 @@ const links = [
     padding: 0 22px;
     font-size: 15px;
   }
-  @media (max-width: 760px) {
+
+  /* ---------- Hamburguesa ---------- */
+  .burger {
+    display: none;
+    width: 52px;
+    height: 46px;
+    padding: 0;
+    border: 2.5px solid var(--ink);
+    border-radius: 15px;
+    background: var(--card);
+    box-shadow: 0 4px 0 rgba(42, 18, 48, 0.85);
+    cursor: pointer;
+    place-content: center;
+    gap: 5px;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .burger:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(42, 18, 48, 0.85);
+  }
+  .burger span {
+    display: block;
+    width: 22px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--ink);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+  .burger:focus-visible {
+    outline: 3px solid var(--coral);
+    outline-offset: 3px;
+  }
+
+  /* ---------- Panel desplegable ---------- */
+  .panel {
+    display: none;
+  }
+  body.menu-bloqueado {
+    overflow: hidden;
+  }
+
+  /* Con 5 enlaces, el menú de escritorio respira menos en pantallas medias. */
+  @media (min-width: 761px) and (max-width: 1220px) {
     .links {
+      gap: 18px;
+    }
+    .links a {
+      font-size: 14.5px;
+      padding-inline: 4px;
+    }
+    .cta {
+      padding-inline: 18px;
+      font-size: 14.5px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .inner {
+      flex-wrap: nowrap;
+      padding-block: 12px;
+    }
+    .logo img {
+      height: 56px;
+    }
+    .links,
+    .inner > .cta {
       display: none;
+    }
+    .burger {
+      display: grid;
+    }
+
+    .menu-open .burger span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    .menu-open .burger span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0.3);
+    }
+    .menu-open .burger span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+
+    .panel {
+      display: block;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--paper);
+      background-image: radial-gradient(rgba(42, 18, 48, 0.09) 1.2px, transparent 1.3px);
+      background-size: 26px 26px;
+      border-top: 3px solid var(--coral);
+      box-shadow: 0 22px 40px rgba(42, 18, 48, 0.24);
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition:
+        max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease,
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0.42s;
+    }
+    .menu-open .panel {
+      max-height: 480px;
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      transition:
+        max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease,
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s;
+    }
+    .panel__inner {
+      display: flex;
+      flex-direction: column;
+      padding-block: 18px 24px;
+    }
+    .panel__kicker {
+      font-size: 26px;
+      color: var(--orange);
+      transform: rotate(-2deg);
+      transform-origin: left center;
+      margin-bottom: 4px;
+    }
+    .panel__links {
+      display: flex;
+      flex-direction: column;
+    }
+    .panel__links a {
+      font-weight: 800;
+      font-size: 20px;
+      padding: 15px 4px;
+      border-bottom: 2px dashed rgba(42, 18, 48, 0.18);
+      position: relative;
+      transition: color 0.2s ease, padding-left 0.25s ease;
+    }
+    .panel__links a::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      bottom: 10px;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--coral);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 0.3s ease;
+    }
+    .panel__links a:hover,
+    .panel__links a:focus-visible {
+      color: var(--coral);
+      padding-left: 12px;
+    }
+    .panel__links a:hover::after,
+    .panel__links a:focus-visible::after {
+      transform: scaleX(1);
+    }
+    .panel__cta {
+      margin-top: 20px;
+      min-height: 54px;
+      background: var(--orange);
+      color: var(--ink);
+      font-size: 16px;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .menu-open .panel,
+    .burger span {
+      transition: none !important;
     }
   }
 </style>

@@ -29,6 +29,14 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* `clip` no crea contenedor de scroll: necesario para el header sticky */
+  overflow-x: clip;
+}
+
+/* Los anclas no quedan tapadas por el header fijo */
+section[id],
+footer[id] {
+  scroll-margin-top: 112px;
 }
 
 a {
@@ -56,6 +64,16 @@ img {
   font-weight: 700;
 }
 
+/* ---------- Animaciones de entrada ---------- */
+html.js-anim [data-fx] {
+  opacity: 0;
+}
+
+.fx-word {
+  display: inline-block;
+  will-change: transform;
+}
+
 /* Botón con "sombra dura" */
 .btn {
   display: inline-flex;
@@ -75,6 +93,11 @@ img {
   transform: translateY(-2px) rotate(-0.6deg);
 }
 
+.btn:active {
+  transform: translateY(2px) rotate(0deg);
+  box-shadow: 0 2px 0 rgba(42, 18, 48, 0.9);
+}
+
 .btn:focus-visible,
 a:focus-visible {
   outline: 3px solid var(--purple);
@@ -86,7 +109,11 @@ a:focus-visible {
     scroll-behavior: auto;
   }
 
-  .btn {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

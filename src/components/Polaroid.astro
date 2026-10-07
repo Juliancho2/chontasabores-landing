@@ -10,7 +10,7 @@ interface Props {
 const { src, alt, caption, rotate = 0, aspect = '1/1' } = Astro.props;
 ---
 
-<figure class="polaroid" style={`--rot:${rotate}deg; --aspect:${aspect}`}>
+<figure class="polaroid" data-fx="pop" style={`--rot:${rotate}deg; --aspect:${aspect}`}>
   <img src={src} alt={alt} loading="lazy" />
   <figcaption class="hand">{caption}</figcaption>
 </figure>
@@ -25,6 +25,15 @@ const { src, alt, caption, rotate = 0, aspect = '1/1' } = Astro.props;
     flex-direction: column;
     gap: 10px;
     transform: rotate(var(--rot));
+    position: relative;
+    transition:
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.4s ease;
+  }
+  .polaroid:hover {
+    transform: rotate(0deg) scale(1.05);
+    box-shadow: 0 24px 46px rgba(42, 18, 48, 0.32);
+    z-index: 2;
   }
   img {
     width: 100%;

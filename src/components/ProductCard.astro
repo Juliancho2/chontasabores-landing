@@ -8,7 +8,7 @@ interface Props {
 const { producto: p } = Astro.props;
 ---
 
-<article class="card">
+<article class="card" data-fx="pop">
   <div class="media" style={`background:${p.bg}`}>
     <img src={p.img} alt={p.alt} loading="lazy" />
   </div>
@@ -42,6 +42,21 @@ const { producto: p } = Astro.props;
     padding: 14px;
     display: flex;
     flex-direction: column;
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.35s ease,
+      border-color 0.35s ease;
+  }
+  .card:hover {
+    transform: translateY(-8px) rotate(-0.5deg);
+    box-shadow: 0 22px 40px rgba(42, 18, 48, 0.2);
+    border-color: rgba(42, 18, 48, 0.75);
+  }
+  .media img {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card:hover .media img {
+    transform: translateY(-10px) scale(1.06);
   }
   .media {
     height: 310px;

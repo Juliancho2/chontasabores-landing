@@ -1,5 +1,6 @@
 ---
 import Polaroid from "./Polaroid.astro";
+import WhatsappIcon from "./WhatsappIcon.astro";
 import { whatsappUrl } from "../data/site";
 
 const col1 = [
@@ -34,40 +35,35 @@ const col2 = [
 
 <section id="inicio" class="hero container">
   <div class="copy">
-    <span class="hand saludo">¡Bienvenidos a nuestra historia!</span>
-    <h1 class="display">
+    <span class="hand saludo" data-fx="words"
+      >¡Bienvenidos a nuestra historia!</span
+    >
+    <h1 class="display" data-fx="words">
       El fruto de <span class="wavy">nuestra tierra</span>, en tu mesa
     </h1>
-    <p>
+    <p data-fx="up">
       Mermelada, almíbar, salmuera y harina de chontaduro. Cultivado, cosechado
       y transformado por una familia del campo, con el respeto de siempre por
       nuestro entorno.
     </p>
     <div class="actions">
-      <a class="btn primary" href={whatsappUrl}>
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path
-            d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"
-          ></path>
-        </svg>
+      <a
+        class="btn primary"
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-fx="up"
+      >
+        <WhatsappIcon size={22} />
         Haz tu pedido
       </a>
-      <a class="btn secondary" href="#productos">Ver la despensa</a>
+      <a class="btn secondary" href="#productos" data-fx="up">Ver la despensa</a
+      >
     </div>
   </div>
 
   <div class="collage">
-    <div class="sun" aria-hidden="true"></div>
+    <div class="sun" aria-hidden="true" data-fx="pop"></div>
     <div class="grid">
       <div class="col">
         {col1.map((p) => <Polaroid {...p} />)}
@@ -98,6 +94,16 @@ const col2 = [
     color: var(--purple);
     transform: rotate(-2deg);
     display: inline-block;
+    animation: sway 5.5s ease-in-out infinite;
+  }
+  @keyframes sway {
+    0%,
+    100% {
+      rotate: -1.6deg;
+    }
+    50% {
+      rotate: 1.6deg;
+    }
   }
   h1 {
     margin: 0;
@@ -148,6 +154,16 @@ const col2 = [
     aspect-ratio: 1 / 1;
     border-radius: 50%;
     background: var(--orange);
+    animation: bob 7s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -20px;
+    }
   }
   .grid {
     position: relative;

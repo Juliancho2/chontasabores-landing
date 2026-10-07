@@ -1,20 +1,21 @@
 ---
 import Polaroid from './Polaroid.astro';
+import WhatsappIcon from './WhatsappIcon.astro';
 import { whatsappUrl, mailUrl } from '../data/site';
 ---
 
 <section id="maquila" class="maquila">
   <div class="container inner">
     <div class="texto">
-      <span class="hand kicker">Para otros negocios</span>
-      <h2 class="display">Servicio de maquila</h2>
-      <p>
+      <span class="hand kicker" data-fx="up">Para otros negocios</span>
+      <h2 class="display" data-fx="words">Servicio de maquila</h2>
+      <p data-fx="up">
         Fabricamos chontaduro en almíbar, mermelada de chontaduro, chontaduro en salmuera y harina de chontaduro, con
         alta calidad y a tu medida. Optimiza tus costos y mejora tu producción con un servicio eficiente y puntual.
       </p>
       <div class="actions">
-        <a class="btn dark" href={whatsappUrl}>Cotiza tu maquila</a>
-        <a class="btn light" href={mailUrl}>Escríbenos</a>
+        <a class="btn dark" href={whatsappUrl} target="_blank" rel="noopener noreferrer" data-fx="up"><WhatsappIcon size={20} />Cotiza tu maquila</a>
+        <a class="btn light" href={mailUrl} data-fx="up">Escríbenos</a>
       </div>
     </div>
     <div class="foto">

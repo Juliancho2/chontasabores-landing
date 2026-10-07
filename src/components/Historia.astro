@@ -3,21 +3,25 @@ const hitos = [
   {
     year: '1950',
     dot: 'var(--coral)',
+    tag: 'Los orígenes',
     text: 'Gonzalo Dulcey e Ismael Zambrano traen las primeras palmas a Cuatro Esquinas. Se cultivaba para el consumo familiar.',
   },
   {
     year: '1970',
     dot: 'var(--orange)',
+    tag: 'Primeras ventas',
     text: 'Los primeros bultos de chontaduro comienzan a comercializarse en Popayán. Un bulto “tres rayas” se vendía por solo $200 pesos.',
   },
   {
     year: 'Hoy',
     dot: 'var(--coral)',
+    tag: 'Al mundo entero',
     text: 'El chontaduro de Cuatro Esquinas llega a mercados internacionales en salmuera, harina, almíbares y mermeladas.',
   },
 ];
 ---
 
+<div class="bloque">
 <svg class="wave top" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
   <path d="M0,40 C180,0 360,80 540,40 S900,0 1080,40 S1320,70 1440,30 L1440,80 L0,80 Z" fill="#3F1E6D"></path>
 </svg>
@@ -25,29 +29,48 @@ const hitos = [
 <section id="historia" class="historia">
   <div class="container inner">
     <div class="texto">
-      <span class="hand kicker">Nuestra historia</span>
-      <h2 class="display">Nació en el campo, entre el esfuerzo y la tradición de una familia</h2>
-      <p>
+      <span class="hand kicker" data-fx="up">Nuestra historia</span>
+      <h2 class="display" data-fx="words">
+        Nació <span class="mark">en el campo</span>, entre el esfuerzo y la tradición de una familia
+      </h2>
+      <p class="lead" data-fx="up">
         Durante años cultivamos el <strong>chontaduro</strong> con pasión, pero notamos que en el mercado no existían
         productos innovadores para disfrutarlo de una manera diferente.
       </p>
-      <p>
+      <p data-fx="up">
         Fue entonces cuando decidimos transformar esta joya natural en mermeladas, almíbares, harinas y otros productos
         únicos. Hoy seguimos creciendo, compartiendo con orgullo el fruto de nuestra tierra y el amor por lo que
         hacemos.
       </p>
+
+      <div class="sello" data-fx="up" aria-hidden="true">
+        <svg class="sello__ring" viewBox="0 0 200 200">
+          <defs>
+            <path id="anillo-sello" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0" />
+          </defs>
+          <text class="sello__texto">
+            <textPath href="#anillo-sello" startOffset="0" textLength="440" lengthAdjust="spacing">
+              · CHONTADURO DE CUATRO ESQUINAS ·
+            </textPath>
+          </text>
+        </svg>
+        <span class="sello__mid display">CS</span>
+      </div>
     </div>
 
     <ol class="timeline">
       {
         hitos.map((h, i) => (
-          <li class={i === hitos.length - 1 ? 'last' : ''}>
+          <li class={i === hitos.length - 1 ? 'last' : ''} data-fx="up">
             <div class="rail">
               <span class="dot" style={`background:${h.dot}`} />
               <span class="line" />
             </div>
-            <div>
-              <div class="year display">{h.year}</div>
+            <div class="ficha">
+              <div class="ficha__head">
+                <span class="year display">{h.year}</span>
+                <span class="tag">{h.tag}</span>
+              </div>
               <p>{h.text}</p>
             </div>
           </li>
@@ -58,8 +81,9 @@ const hitos = [
 </section>
 
 <svg class="wave bottom" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
-  <path d="M0,40 C240,80 420,0 720,40 S1200,80 1440,30 L1440,80 L0,80 Z" fill="#3F1E6D"></path>
+  <path d="M0,40 C240,0 420,80 720,40 S1200,0 1440,50 L1440,0 L0,0 Z" fill="#3F1E6D"></path>
 </svg>
+</div>
 
 <style>
   .wave {
@@ -72,26 +96,77 @@ const hitos = [
   }
   .bottom {
     margin-top: -1px;
-    transform: scaleY(-1);
   }
+
+  /* ---------- Fondo: atmósfera ----------
+     La máscara dibuja la silueta morada completa (wave superior + bloque +
+     wave inferior), así el degradado y el grano salen desde la curva de la
+     wave en lugar de cortarse en una línea recta. */
+  .bloque {
+    position: relative;
+    isolation: isolate;
+    -webkit-mask-image:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201440%2080'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,40%20C180,0%20360,80%20540,40%20S900,0%201080,40%20S1320,70%201440,30%20L1440,80%20L0,80%20Z'%20fill='black'/%3E%3C/svg%3E"),
+      linear-gradient(#000, #000),
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201440%2080'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,40%20C240,0%20420,80%20720,40%20S1200,0%201440,50%20L1440,0%20L0,0%20Z'%20fill='black'/%3E%3C/svg%3E");
+    mask-image:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201440%2080'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,40%20C180,0%20360,80%20540,40%20S900,0%201080,40%20S1320,70%201440,30%20L1440,80%20L0,80%20Z'%20fill='black'/%3E%3C/svg%3E"),
+      linear-gradient(#000, #000),
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201440%2080'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,40%20C240,0%20420,80%20720,40%20S1200,0%201440,50%20L1440,0%20L0,0%20Z'%20fill='black'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 64px, 100% calc(100% - 126px), 100% 64px;
+    mask-size: 100% 64px, 100% calc(100% - 126px), 100% 64px;
+    -webkit-mask-position: 0 0, 0 63px, 0 100%;
+    mask-position: 0 0, 0 63px, 0 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+  .bloque::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(rgba(246, 236, 218, 0.13) 1.2px, transparent 1.3px),
+      radial-gradient(55% 45% at 80% 8%, rgba(247, 135, 69, 0.3), transparent 72%),
+      radial-gradient(45% 40% at 6% 92%, rgba(240, 76, 67, 0.24), transparent 72%);
+    background-size:
+      30px 30px,
+      100% 100%,
+      100% 100%;
+    pointer-events: none;
+  }
+  .bloque::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
   .historia {
     background: var(--purple);
     color: var(--paper);
-    padding-block: 56px 112px;
+    padding-block: 88px 124px;
   }
+
   .inner {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
     gap: 72px;
-    align-items: start;
+    align-items: center;
   }
+
+  /* ---------- Columna de texto ---------- */
   .texto {
     display: flex;
     flex-direction: column;
     gap: 26px;
   }
   .kicker {
-    font-size: 32px;
+    font-size: 33px;
     color: var(--orange);
   }
   h2 {
@@ -100,57 +175,199 @@ const hitos = [
     line-height: 1.04;
     text-wrap: balance;
   }
+  .mark {
+    background-image: linear-gradient(transparent 58%, rgba(247, 135, 69, 0.45) 58%, rgba(247, 135, 69, 0.45) 94%, transparent 94%);
+    padding-inline: 2px;
+  }
   .texto p {
     margin: 0;
-    font-size: 18px;
-    line-height: 1.8;
     font-weight: 600;
-    color: rgba(246, 236, 218, 0.88);
+    color: rgba(246, 236, 218, 0.78);
+    font-size: 17px;
+    line-height: 1.8;
+  }
+  .texto p.lead {
+    font-size: 19.5px;
+    line-height: 1.72;
+    color: rgba(246, 236, 218, 0.94);
   }
   strong {
     color: var(--orange);
   }
+
+  /* ---------- Sello giratorio ---------- */
+  .sello {
+    align-self: flex-start;
+    position: relative;
+    width: 168px;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    margin-top: 4px;
+    border: 2px solid rgba(247, 135, 69, 0.45);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(247, 135, 69, 0.18), transparent 68%);
+  }
+  .sello__ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: girar 26s linear infinite;
+  }
+  .sello__texto {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    fill: var(--orange);
+  }
+  .sello__mid {
+    font-size: 46px;
+    line-height: 1;
+    color: var(--coral);
+    transform: translateY(-1px);
+  }
+  @keyframes girar {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ---------- Timeline: riel ---------- */
   .timeline {
     list-style: none;
     margin: 0;
-    padding: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
   }
   .timeline li {
     display: flex;
-    gap: 24px;
-    padding-bottom: 36px;
-  }
-  .timeline li.last {
-    padding-bottom: 0;
+    gap: 22px;
+    align-items: stretch;
   }
   .rail {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-top: 41px;
   }
   .dot {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    box-shadow:
+      0 0 0 5px rgba(246, 236, 218, 0.16),
+      0 0 0 9px rgba(246, 236, 218, 0.07);
+  }
+  .dot::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.82);
   }
   .line {
     flex: 1;
-    border-left: 3px dotted rgba(246, 236, 218, 0.45);
-    margin-top: 6px;
+    min-height: 34px;
+    border-left: 3px dotted rgba(246, 236, 218, 0.5);
+    margin-top: 8px;
   }
   .last .line {
     display: none;
   }
-  .year {
-    font-size: 44px;
-    line-height: 1;
-    color: var(--orange);
+
+  /* ---------- Timeline: ficha ---------- */
+  .ficha {
+    position: relative;
+    flex: 1;
+    background: var(--card);
+    color: var(--ink);
+    border: 2.5px dashed rgba(42, 18, 48, 0.42);
+    border-radius: 26px;
+    padding: 24px 28px 26px;
+    box-shadow: 0 7px 0 rgba(16, 6, 26, 0.45);
+    transform: rotate(var(--tilt, 0deg));
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.35s ease;
   }
-  .timeline p {
-    margin: 10px 0 0;
-    font-size: 17px;
-    line-height: 1.65;
+  .ficha:hover {
+    transform: rotate(0deg) translateY(-6px);
+    box-shadow: 0 13px 0 rgba(16, 6, 26, 0.45);
+  }
+  /* cinta washi */
+  .ficha::before {
+    content: '';
+    position: absolute;
+    top: -11px;
+    left: 26px;
+    width: 78px;
+    height: 22px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgba(247, 135, 69, 0.9), rgba(240, 76, 67, 0.78));
+    box-shadow: 0 2px 6px rgba(16, 6, 26, 0.3);
+    transform: rotate(-5deg);
+  }
+  .timeline li:nth-child(odd) .ficha {
+    --tilt: -0.7deg;
+  }
+  .timeline li:nth-child(even) .ficha {
+    --tilt: 0.8deg;
+  }
+  .ficha__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-right: 4px;
+  }
+  .year {
+    font-size: clamp(46px, 4.4vw, 64px);
+    line-height: 0.95;
+    color: var(--coral);
+    text-decoration: underline wavy var(--orange);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 9px;
+  }
+  .tag {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--purple);
+    background: rgba(63, 30, 109, 0.08);
+    border: 2px dashed rgba(63, 30, 109, 0.45);
+    border-radius: 999px;
+    padding: 6px 13px;
+    white-space: nowrap;
+    transform: rotate(1.6deg);
+  }
+  .ficha p {
+    margin: 0;
+    font-size: 16.5px;
+    line-height: 1.7;
     font-weight: 600;
+    color: #4a2a52;
+  }
+
+  @media (max-width: 900px) {
+    .inner {
+      gap: 48px;
+      align-items: start;
+    }
+    .timeline {
+      gap: 26px;
+    }
+    .ficha {
+      padding: 22px 22px 24px;
+    }
   }
 </style>

@@ -1,0 +1,408 @@
+---
+import WhatsappIcon from './WhatsappIcon.astro';
+import SocialLinks from './SocialLinks.astro';
+import { whatsappUrl } from '../data/site';
+import { puntosVenta, sellos } from '../data/puntos';
+
+/** Iconos en línea: el tamaño/color lo hereda del contenedor (1em/currentColor). */
+const icons: Record<string, string> = {
+  pin: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm.9 4.6v6.7l4.4 2.6-.8 1.3-5.6-3.3V6.6h2Z"/></svg>`,
+  hoja: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M20.6 3.4C11 3.9 4.7 8.4 4.7 15.3A5.4 5.4 0 0 0 10.1 20.6c6.7 0 10-7.5 10.5-17.2ZM6.7 18.6c1.4-4.6 5-8.1 9.5-9.7-3.7 2.4-6.7 5.8-8.2 9.7l-1.3Z"/></svg>`,
+  corazon: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.6-4.7-9.5-9.1A5.4 5.4 0 0 1 12 6.7a5.4 5.4 0 0 1 9.5 5.2C19.6 16.3 12 21 12 21Z"/></svg>`,
+  chonta: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><circle cx="8.4" cy="15.4" r="4.7"/><circle cx="15.6" cy="15.4" r="4.7"/><circle cx="12" cy="9.6" r="4.7"/></svg>`,
+};
+---
+
+<section id="puntos" class="puntos">
+  <div class="container inner">
+    <div class="head">
+      <div class="title">
+        <span class="hand kicker" data-fx="up">¡Tus productos favoritos, más cerca de ti!</span>
+        <h2 class="display" data-fx="words">Puntos de venta <span class="wavy">autorizados</span></h2>
+      </div>
+      <p data-fx="up">
+        Cinco puntos en Popayán con nuestra mermelada, almíbar, salmuera y harina de chontaduro: sin aditivos y sin
+        conservantes.
+      </p>
+    </div>
+
+    <div class="cols">
+      <ol class="lista">
+        {
+          puntosVenta.map((p) => (
+            <li class="ficha" data-fx="up">
+              <span class="num display">{p.n}</span>
+              <div class="cuerpo">
+                <h3 class="display">{p.nombre}</h3>
+                <p class="dato">
+                  <span class="ico" set:html={icons.pin} />
+                  <span class="txt">
+                    <strong>{p.direccion}</strong>
+                    {p.detalle && <span class="sub">{p.detalle}</span>}
+                  </span>
+                </p>
+                {p.horario && (
+                  <p class="dato">
+                    <span class="ico" set:html={icons.clock} />
+                    <span class="txt">{p.horario}</span>
+                  </p>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <aside class="lado">
+        <div class="cartel" data-fx="up">
+          <span class="hand cartel__t">Productos artesanales</span>
+          <ul class="sellos">
+            {
+              sellos.map((s) => (
+                <li class="sello">
+                  <span class="sello__ico" set:html={icons[s.icono]} />
+                  <span class="sello__txt">{s.texto}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <p class="hand apoya" data-fx="up">
+          Apoya lo nuestro, apoya a nuestras familias y a nuestra región ♡
+        </p>
+
+        <a class="btn light" href={whatsappUrl} target="_blank" rel="noopener noreferrer" data-fx="up">
+          <WhatsappIcon size={20} />Pregunta por tu punto más cercano
+        </a>
+
+        <span class="redes" data-fx="up">
+          Síguenos en nuestras redes <strong>chontasabores</strong>
+        </span>
+
+        <div class="social-row" data-fx="up">
+          <SocialLinks />
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .puntos {
+    position: relative;
+    isolation: isolate;
+    color: var(--paper);
+    padding-block: 104px;
+    background:
+      radial-gradient(58% 52% at 90% 100%, rgba(247, 135, 69, 0.4), transparent 70%),
+      radial-gradient(46% 38% at 0% 0%, rgba(240, 76, 67, 0.24), transparent 72%),
+      var(--purple);
+  }
+  .puntos::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(rgba(246, 236, 218, 0.09) 1.4px, transparent 1.6px);
+    background-size: 30px 30px;
+  }
+  .inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 26px;
+  }
+  .title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 800px;
+  }
+  .kicker {
+    font-size: 32px;
+    color: var(--orange);
+    transform: rotate(-1.4deg);
+    transform-origin: left center;
+    align-self: flex-start;
+  }
+  h2 {
+    margin: 0;
+    font-size: clamp(46px, 6vw, 88px);
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .wavy {
+    text-decoration: underline wavy var(--orange);
+    text-decoration-thickness: 4px;
+    text-underline-offset: 10px;
+  }
+  .head > p {
+    margin: 0;
+    max-width: 380px;
+    font-size: 16px;
+    line-height: 1.7;
+    font-weight: 700;
+    color: rgba(246, 236, 218, 0.78);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: 44px;
+    align-items: start;
+  }
+
+  /* ---------- Lista de puntos ---------- */
+  .lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .ficha {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    background: var(--card);
+    color: var(--ink);
+    border: 2.5px dashed rgba(42, 18, 48, 0.42);
+    border-radius: 26px;
+    padding: 20px 24px;
+    box-shadow: 0 7px 0 rgba(16, 6, 26, 0.45);
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.35s ease,
+      border-color 0.35s ease;
+  }
+  .ficha:hover {
+    transform: translateY(-6px) rotate(-0.4deg);
+    border-color: rgba(42, 18, 48, 0.78);
+    box-shadow: 0 13px 0 rgba(16, 6, 26, 0.45);
+  }
+  .num {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    align-self: start;
+    border-radius: 50%;
+    background: var(--coral);
+    border: 2.5px solid var(--ink);
+    color: var(--paper);
+    font-size: 21px;
+    rotate: -7deg;
+  }
+  .cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .cuerpo h3 {
+    margin: 0;
+    font-size: clamp(22px, 2vw, 27px);
+    line-height: 1.05;
+  }
+  .dato {
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    font-size: 15.5px;
+    line-height: 1.5;
+    font-weight: 700;
+    color: #4a2a52;
+  }
+  .ico {
+    flex: none;
+    display: inline-flex;
+    margin-top: 2px;
+    font-size: 19px;
+    color: var(--coral);
+  }
+  .txt {
+    min-width: 0;
+  }
+  .txt strong {
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .sub {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #7a5a80;
+  }
+
+  /* ---------- Columna lateral ---------- */
+  .lado {
+    position: sticky;
+    top: 122px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 26px;
+  }
+  .cartel {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 2.5px dashed rgba(246, 236, 218, 0.5);
+    border-radius: 26px;
+    padding: 26px 26px 30px;
+    box-shadow: 0 7px 0 rgba(8, 2, 16, 0.6);
+  }
+  .cartel::before {
+    content: '';
+    position: absolute;
+    top: -11px;
+    right: 28px;
+    width: 86px;
+    height: 22px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgba(247, 135, 69, 0.95), rgba(240, 76, 67, 0.8));
+    box-shadow: 0 2px 6px rgba(8, 2, 16, 0.4);
+    transform: rotate(4deg);
+  }
+  .cartel__t {
+    align-self: flex-start;
+    font-size: clamp(30px, 3vw, 36px);
+    line-height: 1;
+    color: var(--orange);
+    transform: rotate(-1.5deg);
+    transform-origin: left center;
+  }
+  .sellos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .sello {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+  .sello__ico {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 2px dashed rgba(246, 236, 218, 0.55);
+    background: rgba(246, 236, 218, 0.07);
+    color: var(--orange);
+    font-size: 26px;
+  }
+  .sello__txt {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.45;
+    color: rgba(246, 236, 218, 0.85);
+  }
+  .apoya {
+    margin: 0;
+    font-size: clamp(30px, 3vw, 40px);
+    line-height: 1.12;
+    color: var(--orange);
+    transform: rotate(-1deg);
+    transform-origin: left center;
+    max-width: 520px;
+  }
+  .light {
+    background: var(--card);
+    color: var(--ink);
+    max-width: 100%;
+  }
+  .redes {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(246, 236, 218, 0.85);
+    border: 2px dashed rgba(246, 236, 218, 0.45);
+    border-radius: 999px;
+    padding: 9px 16px;
+    transform: rotate(1.2deg);
+  }
+  .redes strong {
+    color: var(--orange);
+  }
+
+  @media (max-width: 1000px) {
+    .cols {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .lado {
+      position: static;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .puntos {
+      padding-block: 80px;
+    }
+    .inner {
+      gap: 42px;
+    }
+    .kicker {
+      font-size: 26px;
+    }
+    .head > p {
+      max-width: none;
+    }
+    .ficha {
+      padding: 18px;
+      gap: 14px;
+      border-radius: 22px;
+    }
+    .num {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    }
+    .sellos {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .sello {
+      flex-direction: row;
+      align-items: center;
+      text-align: left;
+      gap: 14px;
+    }
+    .sello__ico {
+      flex: none;
+      width: 46px;
+      height: 46px;
+      font-size: 22px;
+    }
+    .redes {
+      white-space: normal;
+    }
+  }
+</style>
