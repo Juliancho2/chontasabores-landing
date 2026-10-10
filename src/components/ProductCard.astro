@@ -1,6 +1,6 @@
 ---
 import type { Producto } from '../data/productos';
-import WhatsappIcon from './WhatsappIcon.astro';
+import CartIcon from './CartIcon.astro';
 import { whatsappUrl } from '../data/site';
 
 interface Props {
@@ -11,7 +11,7 @@ const { producto: p } = Astro.props;
 const first = p.formats[0];
 ---
 
-<article class="card" data-fx="pop" data-name={p.title} data-wa={whatsappUrl}>
+<article class="card" data-fx="pop" data-name={p.title} data-wa={whatsappUrl} data-sel="0" data-qty="1">
   <div class="media" style={`background:${p.bg}`}>
     <img src={p.img} alt={p.alt} loading="lazy" />
   </div>
@@ -46,7 +46,7 @@ const first = p.formats[0];
     <div class="order">
       <div class="qty" role="group" aria-label="Cantidad de unidades">
         <button type="button" class="qty__btn" data-step="-1" aria-label="Quitar una unidad">−</button>
-        <span class="qty__n" data-qty aria-live="polite">1</span>
+        <span class="qty__n" aria-live="polite">1</span>
         <button type="button" class="qty__btn" data-step="1" aria-label="Añadir una unidad">+</button>
       </div>
 
@@ -55,79 +55,12 @@ const first = p.formats[0];
         <strong class="total__val display" data-total>{first.unit}</strong>
       </div>
 
-      <a class="btn order__cta" href={whatsappUrl} data-order target="_blank" rel="noopener noreferrer">
-        <WhatsappIcon size={17} />Pedir por WhatsApp
-      </a>
+      <button class="btn order__cta add" type="button">
+        <CartIcon size={17} />Añadir al carrito
+      </button>
     </div>
   </div>
 </article>
-
-<script>
-  const cop = new Intl.NumberFormat('es-CO');
-  const toNumber = (s: string) => parseInt(s.replace(/\D/g, ''), 10) || 0;
-
-  document.querySelectorAll<HTMLElement>('article.card[data-wa]').forEach((card) => {
-    const base = card.dataset.wa ?? '';
-    const nombre = card.dataset.name ?? '';
-    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>('.fmt'));
-    const qtyEl = card.querySelector<HTMLElement>('[data-qty]');
-    const totalEl = card.querySelector<HTMLElement>('[data-total]');
-    const modeEl = card.querySelector<HTMLElement>('[data-mode]');
-    const link = card.querySelector<HTMLAnchorElement>('[data-order]');
-    const steps = card.querySelectorAll<HTMLButtonElement>('.qty__btn');
-
-    if (!fmts.length || !qtyEl || !totalEl || !modeEl || !link) return;
-
-    let sel = 0;
-    let qty = 1;
-
-    const pintar = () => {
-      const f = fmts[sel];
-      const unitario0 = toNumber(f.dataset.unit ?? '');
-      const mayor = f.dataset.mayor ? toNumber(f.dataset.mayor) : 0;
-      const alPorMayor = mayor > 0 && qty >= 6;
-      const unitario = alPorMayor ? mayor : unitario0;
-      const total = unitario * qty;
-
-      qtyEl.textContent = String(qty);
-      totalEl.textContent = '$' + cop.format(total);
-      modeEl.textContent = alPorMayor ? 'Precio por mayor' : 'Precio unitario';
-      fmts.forEach((el, i) => el.setAttribute('aria-pressed', i === sel ? 'true' : 'false'));
-
-      const msg = [
-        '¡Hola, Chonta Sabores! 🌴',
-        'Quiero pedir desde su página:',
-        '',
-        `• Producto: ${nombre}`,
-        `• Presentación: ${f.dataset.size ?? ''}`,
-        `• Cantidad: ${qty} ${qty === 1 ? 'unidad' : 'unidades'}`,
-        `• Precio c/u: $${cop.format(unitario)}${alPorMayor ? ' (por mayor)' : ''}`,
-        `• Total: $${cop.format(total)}`,
-        '',
-        '¿Me pueden confirmar disponibilidad y envío? ¡Gracias!',
-      ].join('\n');
-
-      link.href = `${base}?text=${encodeURIComponent(msg)}`;
-    };
-
-    fmts.forEach((el, i) => {
-      el.addEventListener('click', () => {
-        sel = i;
-        pintar();
-      });
-    });
-
-    steps.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const d = Number(btn.dataset.step ?? 0);
-        qty = Math.min(999, Math.max(1, qty + d));
-        pintar();
-      });
-    });
-
-    pintar();
-  });
-</script>
 
 <style>
   .card {

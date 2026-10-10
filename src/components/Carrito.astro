@@ -1,0 +1,614 @@
+---
+import CartIcon from './CartIcon.astro';
+import WhatsappIcon from './WhatsappIcon.astro';
+import { whatsappUrl } from '../data/site';
+---
+
+<button class="fab" type="button" data-open aria-expanded="false" aria-controls="carrito" aria-label="Abrir tu pedido">
+  <CartIcon size={26} />
+  <span class="fab__n" data-count hidden>0</span>
+</button>
+
+<div class="scrim" data-close></div>
+
+<aside class="drawer" id="carrito" role="dialog" aria-modal="true" aria-label="Tu pedido" aria-hidden="true">
+  <header class="top">
+    <div class="top__txt">
+      <span class="hand kicker">Tu pedido</span>
+      <p class="sub">Revisa y envíalo por WhatsApp</p>
+    </div>
+    <button class="x" type="button" data-close aria-label="Cerrar el carrito">✕</button>
+  </header>
+
+  <ul class="lines" data-lines></ul>
+
+  <p class="empty" data-empty>
+    <strong>Tu carrito está vacío.</strong>
+    Añade productos desde la sección <em>Nuestros productos</em>.
+  </p>
+
+  <footer class="foot">
+    <div class="foot__row">
+      <span class="foot__label">Total <em data-units>0 unidades</em></span>
+      <strong class="foot__total display" data-total-cart>$0</strong>
+    </div>
+    <a class="btn wa" data-wa-link href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+      <WhatsappIcon size={18} />Pedir por WhatsApp
+    </a>
+    <button class="clear" type="button" data-clear>Vaciar carrito</button>
+  </footer>
+</aside>
+
+<script>
+  interface Linea {
+    k: string;
+    nombre: string;
+    size: string;
+    unit: number;
+    mayor: number;
+    qty: number;
+  }
+
+  const KEY = 'chonta-carrito-v1';
+  const cop = new Intl.NumberFormat('es-CO');
+  const money = (n: number) => '$' + cop.format(n);
+  const num = (s: string) => parseInt(s.replace(/\D/g, ''), 10) || 0;
+
+  function q<T extends HTMLElement>(sel: string, root: ParentNode = document): T | null {
+    return root.querySelector<T>(sel);
+  }
+
+  /* ---------- estado ---------- */
+  let lineas: Linea[] = [];
+  try {
+    lineas = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (!Array.isArray(lineas)) lineas = [];
+  } catch {
+    lineas = [];
+  }
+
+  function guardar() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(lineas));
+    } catch {
+      /* modo privado / file:// */
+    }
+  }
+
+  const precioDe = (l: Linea) => (l.mayor > 0 && l.qty >= 6 ? l.mayor : l.unit);
+  const esMayor = (l: Linea) => l.mayor > 0 && l.qty >= 6;
+
+  /* ---------- tarjetas ---------- */
+  function pintarCard(card: HTMLElement) {
+    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>('.fmt'));
+    const sel = Number(card.dataset.sel || 0);
+    const qty = Number(card.dataset.qty || 1);
+    const f = fmts[sel] || fmts[0];
+    if (!f) return;
+
+    const unit = num(f.dataset.unit || '');
+    const mayor = f.dataset.mayor ? num(f.dataset.mayor) : 0;
+    const alMayor = mayor > 0 && qty >= 6;
+    const precio = alMayor ? mayor : unit;
+
+    const n = q<HTMLElement>('.qty__n', card);
+    const total = q<HTMLElement>('[data-total]', card);
+    const modo = q<HTMLElement>('[data-mode]', card);
+
+    if (n) n.textContent = String(qty);
+    if (total) total.textContent = money(precio * qty);
+    if (modo) modo.textContent = alMayor ? 'Precio por mayor' : 'Precio unitario';
+    fmts.forEach((b, i) => b.setAttribute('aria-pressed', i === sel ? 'true' : 'false'));
+  }
+
+  function addDesdeCard(card: HTMLElement) {
+    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>('.fmt'));
+    const f = fmts[Number(card.dataset.sel || 0)];
+    if (!f) return;
+
+    const nombre = card.dataset.name || '';
+    const size = f.dataset.size || '';
+    const k = nombre + '|' + size;
+    const qty = Math.max(1, Number(card.dataset.qty || 1));
+    const existente = lineas.find((l) => l.k === k);
+
+    if (existente) existente.qty = Math.min(999, existente.qty + qty);
+    else
+      lineas.push({
+        k,
+        nombre,
+        size,
+        unit: num(f.dataset.unit || ''),
+        mayor: f.dataset.mayor ? num(f.dataset.mayor) : 0,
+        qty,
+      });
+
+    guardar();
+    render();
+    abrir(true);
+  }
+
+  /* ---------- carrito ---------- */
+  function render() {
+    const count = lineas.reduce((a, l) => a + l.qty, 0);
+    const total = lineas.reduce((a, l) => a + precioDe(l) * l.qty, 0);
+
+    const badge = q<HTMLElement>('[data-count]');
+    if (badge) {
+      badge.textContent = String(count);
+      badge.hidden = count === 0;
+    }
+
+    const ul = q<HTMLElement>('[data-lines]');
+    const empty = q<HTMLElement>('[data-empty]');
+    if (ul) {
+      ul.innerHTML = lineas
+        .map(
+          (l, i) => `
+        <li class="line">
+          <div class="line__txt">
+            <strong class="line__t">${l.nombre}</strong>
+            <span class="line__s">${l.size} · ${money(precioDe(l))} c/u${esMayor(l) ? ' (por mayor)' : ''}</span>
+          </div>
+          <div class="line__qty">
+            <button type="button" class="mini" data-dec="${i}" aria-label="Quitar una unidad">−</button>
+            <span class="line__n">${l.qty}</span>
+            <button type="button" class="mini" data-inc="${i}" aria-label="Sumar una unidad">+</button>
+          </div>
+          <strong class="line__tot display">${money(precioDe(l) * l.qty)}</strong>
+          <button type="button" class="line__x" data-del="${i}" aria-label="Eliminar ${l.nombre}">✕</button>
+        </li>`,
+        )
+        .join('');
+    }
+    if (empty) empty.hidden = lineas.length > 0;
+
+    const units = q<HTMLElement>('[data-units]');
+    const tEl = q<HTMLElement>('[data-total-cart]');
+    if (units) units.textContent = count === 1 ? '1 unidad' : `${count} unidades`;
+    if (tEl) tEl.textContent = money(total);
+
+    const wa = q<HTMLAnchorElement>('[data-wa-link]');
+    if (wa) {
+      if (!lineas.length) {
+        wa.href = wa.dataset.base || '#';
+        wa.classList.add('is-off');
+      } else {
+        const msg = [
+          '¡Hola, Chonta Sabores! 🌴',
+          'Quiero hacer este pedido desde su página:',
+          '',
+          ...lineas.map(
+            (l, i) =>
+              `${i + 1}. ${l.nombre} — ${l.size}\n   ${l.qty} ${l.qty === 1 ? 'unidad' : 'unidades'} × ${money(precioDe(l))}${
+                esMayor(l) ? ' (por mayor)' : ''
+              } = ${money(precioDe(l) * l.qty)}`,
+          ),
+          '',
+          `Total: ${money(total)} · ${count} ${count === 1 ? 'unidad' : 'unidades'}`,
+          '',
+          '¿Me pueden confirmar disponibilidad y envío? ¡Gracias!',
+        ].join('\n');
+        wa.href = `${wa.dataset.base}?text=${encodeURIComponent(msg)}`;
+        wa.classList.remove('is-off');
+      }
+    }
+
+    const clear = q<HTMLButtonElement>('[data-clear]');
+    if (clear) clear.hidden = lineas.length === 0;
+  }
+
+  const drawer = q<HTMLElement>('.drawer');
+  const scrim = q<HTMLElement>('.scrim');
+  const fab = q<HTMLButtonElement>('.fab');
+
+  function abrir(on: boolean) {
+    if (!drawer || !scrim || !fab) return;
+    drawer.classList.toggle('is-on', on);
+    scrim.classList.toggle('is-on', on);
+    drawer.setAttribute('aria-hidden', String(!on));
+    fab.setAttribute('aria-expanded', String(on));
+    document.documentElement.classList.toggle('cart-open', on);
+    if (on) q<HTMLButtonElement>('.x', drawer)?.focus();
+  }
+
+  /* ---------- eventos ---------- */
+  document.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement | null;
+    if (!t) return;
+
+    const dec = t.closest<HTMLElement>('[data-dec]');
+    const inc = t.closest<HTMLElement>('[data-inc]');
+    const del = t.closest<HTMLElement>('[data-del]');
+
+    if (dec || inc || del) {
+      const i = Number((dec || inc || del)!.getAttribute('data-' + (dec ? 'dec' : inc ? 'inc' : 'del')));
+      const l = lineas[i];
+      if (l) {
+        if (del) lineas.splice(i, 1);
+        else if (inc) l.qty = Math.min(999, l.qty + 1);
+        else l.qty = Math.max(1, l.qty - 1);
+        guardar();
+        render();
+      }
+      return;
+    }
+
+    if (t.closest('[data-clear]')) {
+      lineas = [];
+      guardar();
+      render();
+      return;
+    }
+
+    if (t.closest('[data-open]')) return abrir(true);
+    if (t.closest('[data-close]')) return abrir(false);
+
+    const add = t.closest<HTMLElement>('.card .add');
+    if (add) {
+      const card = add.closest<HTMLElement>('.card');
+      if (card) addDesdeCard(card);
+      return;
+    }
+
+    const fmt = t.closest<HTMLElement>('.card .fmt');
+    if (fmt) {
+      const card = fmt.closest<HTMLElement>('.card');
+      if (card) {
+        const fmts = Array.from(card.querySelectorAll<HTMLElement>('.fmt'));
+        card.dataset.sel = String(fmts.indexOf(fmt));
+        pintarCard(card);
+      }
+      return;
+    }
+
+    const step = t.closest<HTMLButtonElement>('.card .qty__btn');
+    if (step) {
+      const card = step.closest<HTMLElement>('.card');
+      if (card) {
+        const qty = Number(card.dataset.qty || 1) + Number(step.dataset.step || 0);
+        card.dataset.qty = String(Math.min(999, Math.max(1, qty)));
+        pintarCard(card);
+      }
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') abrir(false);
+  });
+
+  /* ---------- arranque ---------- */
+  document.querySelectorAll<HTMLElement>('.card[data-name]').forEach((card) => {
+    if (!card.dataset.sel) card.dataset.sel = '0';
+    if (!card.dataset.qty) card.dataset.qty = '1';
+    pintarCard(card);
+  });
+
+  const waInicial = q<HTMLAnchorElement>('[data-wa-link]');
+  if (waInicial) waInicial.dataset.base = waInicial.getAttribute('href') || '';
+  render();
+</script>
+
+<style>
+  .fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 90;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 2.5px solid var(--ink);
+    background: var(--purple);
+    color: var(--paper);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 5px 0 rgba(42, 18, 48, 0.9);
+    transition: transform 0.2s ease;
+  }
+  .fab:hover {
+    transform: translateY(-3px) rotate(-3deg);
+  }
+  .fab:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(42, 18, 48, 0.9);
+  }
+  .fab:focus-visible {
+    outline: 3px solid var(--coral);
+    outline-offset: 3px;
+  }
+  .fab__n {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--coral);
+    color: #fff;
+    border: 2.5px solid var(--paper);
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 21px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    background: rgba(42, 18, 48, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .scrim.is-on {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    width: min(390px, 100vw);
+    height: 100dvh;
+    background: var(--paper);
+    border-left: 2.5px solid var(--ink);
+    box-shadow: -14px 0 40px rgba(42, 18, 48, 0.35);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 14px;
+    transform: translateX(102%);
+    visibility: hidden;
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 0.35s;
+    overflow: hidden;
+  }
+  .drawer.is-on {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s;
+  }
+
+  .top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 2.5px dashed rgba(42, 18, 48, 0.4);
+    padding-bottom: 12px;
+  }
+  .kicker {
+    display: block;
+    font-size: 26px;
+    color: var(--purple);
+    line-height: 1;
+  }
+  .sub {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #6a4a70;
+  }
+  .x {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 2px dashed rgba(42, 18, 48, 0.5);
+    background: var(--card);
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .x:hover {
+    background: var(--orange);
+  }
+
+  .lines {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  /* Las líneas se generan en runtime (sin data-astro-cid): estilos globales */
+  .drawer :global(.line) {
+    background: var(--card);
+    border: 2px dashed rgba(42, 18, 48, 0.4);
+    border-radius: 16px;
+    padding: 11px 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'txt qty'
+      'tot x';
+    gap: 8px;
+    align-items: center;
+  }
+  .drawer :global(.line__txt) {
+    grid-area: txt;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .drawer :global(.line__t) {
+    font-size: 14px;
+    line-height: 1.15;
+  }
+  .drawer :global(.line__s) {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #6a4a70;
+    font-variant-numeric: tabular-nums;
+  }
+  .drawer :global(.line__qty) {
+    grid-area: qty;
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .drawer :global(.mini) {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: var(--kraft);
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .drawer :global(.mini:hover) {
+    background: var(--orange);
+  }
+  .drawer :global(.line__n) {
+    min-width: 26px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .drawer :global(.line__tot) {
+    grid-area: tot;
+    font-size: 19px;
+    font-variant-numeric: tabular-nums;
+  }
+  .drawer :global(.line__x) {
+    grid-area: x;
+    justify-self: end;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    background: none;
+    color: var(--coral);
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  .drawer :global(.line__x:hover) {
+    background: rgba(240, 76, 67, 0.15);
+  }
+
+  .empty {
+    margin: auto 0;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 600;
+    color: #6a4a70;
+    border: 2.5px dashed rgba(42, 18, 48, 0.35);
+    border-radius: 18px;
+    padding: 22px 16px;
+  }
+  .empty strong {
+    display: block;
+    color: var(--ink);
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .foot {
+    border-top: 2.5px dashed rgba(42, 18, 48, 0.4);
+    padding-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .foot__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .foot__label {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6a4a70;
+  }
+  .foot__label em {
+    display: block;
+    font-style: normal;
+    font-size: 11px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 700;
+    color: #8a7090;
+  }
+  .foot__total {
+    font-size: 27px;
+    font-variant-numeric: tabular-nums;
+  }
+  .wa {
+    width: 100%;
+    background: var(--purple);
+    color: var(--paper);
+  }
+  .wa.is-off {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .clear {
+    align-self: center;
+    background: none;
+    border: 0;
+    color: var(--coral);
+    font-size: 12.5px;
+    font-weight: 800;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  :global(html.cart-open) {
+    overflow: hidden;
+  }
+
+  :global(.fab:focus-visible),
+  .drawer button:focus-visible,
+  .drawer a:focus-visible {
+    outline: 3px solid var(--coral);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 560px) {
+    .fab {
+      width: 56px;
+      height: 56px;
+      right: 14px;
+      bottom: 14px;
+    }
+    .drawer {
+      width: 100vw;
+      border-left: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fab,
+    .scrim,
+    .drawer {
+      transition: none !important;
+    }
+  }
+</style>
