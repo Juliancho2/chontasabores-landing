@@ -24,9 +24,11 @@ const { producto: p } = Astro.props;
               <span class="dots" />
               <span class="unit display">{f.unit}</span>
             </div>
-            <div class="tiers">
-              6–12 uds {f.mid} · 13+ uds {f.high}
-            </div>
+            {f.mayor && (
+              <div class="tiers">
+                Por mayor desde 6 uds: {f.mayor} c/u
+              </div>
+            )}
           </div>
         ))
       }
