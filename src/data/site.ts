@@ -1,6 +1,6 @@
 export const site = {
   name: 'Chonta Sabores',
-  whatsapp: '573505441148', // formato internacional, sin "+" ni espacios
+  whatsapp: '573505441148',
   phoneDisplay: '350 544 1148',
   email: 'chontasabores0421@gmail.com',
   address: 'Popayán, Colombia, 8-49',

@@ -1,23 +1,39 @@
 ---
-import CartIcon from './CartIcon.astro';
-import WhatsappIcon from './WhatsappIcon.astro';
-import { whatsappUrl } from '../data/site';
+import CartIcon from "./CartIcon.astro";
+import WhatsappIcon from "./WhatsappIcon.astro";
+import { whatsappUrl } from "../data/site";
 ---
 
-<button class="fab" type="button" data-open aria-expanded="false" aria-controls="carrito" aria-label="Abrir tu pedido">
+<button
+  class="fab"
+  type="button"
+  data-open
+  aria-expanded="false"
+  aria-controls="carrito"
+  aria-label="Abrir tu pedido"
+>
   <CartIcon size={26} />
   <span class="fab__n" data-count hidden>0</span>
 </button>
 
 <div class="scrim" data-close></div>
 
-<aside class="drawer" id="carrito" role="dialog" aria-modal="true" aria-label="Tu pedido" aria-hidden="true">
+<aside
+  class="drawer"
+  id="carrito"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Tu pedido"
+  aria-hidden="true"
+>
   <header class="top">
     <div class="top__txt">
       <span class="hand kicker">Tu pedido</span>
       <p class="sub">Revisa y envíalo por WhatsApp</p>
     </div>
-    <button class="x" type="button" data-close aria-label="Cerrar el carrito">✕</button>
+    <button class="x" type="button" data-close aria-label="Cerrar el carrito"
+      >✕</button
+    >
   </header>
 
   <ul class="lines" data-lines></ul>
@@ -32,7 +48,13 @@ import { whatsappUrl } from '../data/site';
       <span class="foot__label">Total <em data-units>0 unidades</em></span>
       <strong class="foot__total display" data-total-cart>$0</strong>
     </div>
-    <a class="btn wa" data-wa-link href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+    <a
+      class="btn wa"
+      data-wa-link
+      href={whatsappUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <WhatsappIcon size={18} />Pedir por WhatsApp
     </a>
     <button class="clear" type="button" data-clear>Vaciar carrito</button>
@@ -49,19 +71,22 @@ import { whatsappUrl } from '../data/site';
     qty: number;
   }
 
-  const KEY = 'chonta-carrito-v1';
-  const cop = new Intl.NumberFormat('es-CO');
-  const money = (n: number) => '$' + cop.format(n);
-  const num = (s: string) => parseInt(s.replace(/\D/g, ''), 10) || 0;
+  const KEY = "chonta-carrito-v1";
+  const cop = new Intl.NumberFormat("es-CO");
+  const money = (n: number) => "$" + cop.format(n);
+  const num = (s: string) => parseInt(s.replace(/\D/g, ""), 10) || 0;
 
-  function q<T extends HTMLElement>(sel: string, root: ParentNode = document): T | null {
+  function q<T extends HTMLElement>(
+    sel: string,
+    root: ParentNode = document,
+  ): T | null {
     return root.querySelector<T>(sel);
   }
 
   /* ---------- estado ---------- */
   let lineas: Linea[] = [];
   try {
-    lineas = JSON.parse(localStorage.getItem(KEY) || '[]');
+    lineas = JSON.parse(localStorage.getItem(KEY) || "[]");
     if (!Array.isArray(lineas)) lineas = [];
   } catch {
     lineas = [];
@@ -80,35 +105,38 @@ import { whatsappUrl } from '../data/site';
 
   /* ---------- tarjetas ---------- */
   function pintarCard(card: HTMLElement) {
-    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>('.fmt'));
+    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>(".fmt"));
     const sel = Number(card.dataset.sel || 0);
     const qty = Number(card.dataset.qty || 1);
     const f = fmts[sel] || fmts[0];
     if (!f) return;
 
-    const unit = num(f.dataset.unit || '');
+    const unit = num(f.dataset.unit || "");
     const mayor = f.dataset.mayor ? num(f.dataset.mayor) : 0;
     const alMayor = mayor > 0 && qty >= 6;
     const precio = alMayor ? mayor : unit;
 
-    const n = q<HTMLElement>('.qty__n', card);
-    const total = q<HTMLElement>('[data-total]', card);
-    const modo = q<HTMLElement>('[data-mode]', card);
+    const n = q<HTMLElement>(".qty__n", card);
+    const total = q<HTMLElement>("[data-total]", card);
+    const modo = q<HTMLElement>("[data-mode]", card);
 
     if (n) n.textContent = String(qty);
     if (total) total.textContent = money(precio * qty);
-    if (modo) modo.textContent = alMayor ? 'Precio por mayor' : 'Precio unitario';
-    fmts.forEach((b, i) => b.setAttribute('aria-pressed', i === sel ? 'true' : 'false'));
+    if (modo)
+      modo.textContent = alMayor ? "Precio por mayor" : "Precio unitario";
+    fmts.forEach((b, i) =>
+      b.setAttribute("aria-pressed", i === sel ? "true" : "false"),
+    );
   }
 
   function addDesdeCard(card: HTMLElement) {
-    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>('.fmt'));
+    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>(".fmt"));
     const f = fmts[Number(card.dataset.sel || 0)];
     if (!f) return;
 
-    const nombre = card.dataset.name || '';
-    const size = f.dataset.size || '';
-    const k = nombre + '|' + size;
+    const nombre = card.dataset.name || "";
+    const size = f.dataset.size || "";
+    const k = nombre + "|" + size;
     const qty = Math.max(1, Number(card.dataset.qty || 1));
     const existente = lineas.find((l) => l.k === k);
 
@@ -118,7 +146,7 @@ import { whatsappUrl } from '../data/site';
         k,
         nombre,
         size,
-        unit: num(f.dataset.unit || ''),
+        unit: num(f.dataset.unit || ""),
         mayor: f.dataset.mayor ? num(f.dataset.mayor) : 0,
         qty,
       });
@@ -133,14 +161,14 @@ import { whatsappUrl } from '../data/site';
     const count = lineas.reduce((a, l) => a + l.qty, 0);
     const total = lineas.reduce((a, l) => a + precioDe(l) * l.qty, 0);
 
-    const badge = q<HTMLElement>('[data-count]');
+    const badge = q<HTMLElement>("[data-count]");
     if (badge) {
       badge.textContent = String(count);
       badge.hidden = count === 0;
     }
 
-    const ul = q<HTMLElement>('[data-lines]');
-    const empty = q<HTMLElement>('[data-empty]');
+    const ul = q<HTMLElement>("[data-lines]");
+    const empty = q<HTMLElement>("[data-empty]");
     if (ul) {
       ul.innerHTML = lineas
         .map(
@@ -148,7 +176,7 @@ import { whatsappUrl } from '../data/site';
         <li class="line">
           <div class="line__txt">
             <strong class="line__t">${l.nombre}</strong>
-            <span class="line__s">${l.size} · ${money(precioDe(l))} c/u${esMayor(l) ? ' (por mayor)' : ''}</span>
+            <span class="line__s">${l.size} · ${money(precioDe(l))} c/u${esMayor(l) ? " (por mayor)" : ""}</span>
           </div>
           <div class="line__qty">
             <button type="button" class="mini" data-dec="${i}" aria-label="Quitar una unidad">−</button>
@@ -159,70 +187,75 @@ import { whatsappUrl } from '../data/site';
           <button type="button" class="line__x" data-del="${i}" aria-label="Eliminar ${l.nombre}">✕</button>
         </li>`,
         )
-        .join('');
+        .join("");
     }
     if (empty) empty.hidden = lineas.length > 0;
 
-    const units = q<HTMLElement>('[data-units]');
-    const tEl = q<HTMLElement>('[data-total-cart]');
-    if (units) units.textContent = count === 1 ? '1 unidad' : `${count} unidades`;
+    const units = q<HTMLElement>("[data-units]");
+    const tEl = q<HTMLElement>("[data-total-cart]");
+    if (units)
+      units.textContent = count === 1 ? "1 unidad" : `${count} unidades`;
     if (tEl) tEl.textContent = money(total);
 
-    const wa = q<HTMLAnchorElement>('[data-wa-link]');
+    const wa = q<HTMLAnchorElement>("[data-wa-link]");
     if (wa) {
       if (!lineas.length) {
-        wa.href = wa.dataset.base || '#';
-        wa.classList.add('is-off');
+        wa.href = wa.dataset.base || "#";
+        wa.classList.add("is-off");
       } else {
         const msg = [
-          '¡Hola, Chonta Sabores! 🌴',
-          'Quiero hacer este pedido desde su página:',
-          '',
+          "¡Hola, Chonta Sabores!",
+          "Quiero hacer este pedido desde su página:",
+          "",
           ...lineas.map(
             (l, i) =>
-              `${i + 1}. ${l.nombre} — ${l.size}\n   ${l.qty} ${l.qty === 1 ? 'unidad' : 'unidades'} × ${money(precioDe(l))}${
-                esMayor(l) ? ' (por mayor)' : ''
+              `${i + 1}. ${l.nombre} — ${l.size}\n   ${l.qty} ${l.qty === 1 ? "unidad" : "unidades"} × ${money(precioDe(l))}${
+                esMayor(l) ? " (por mayor)" : ""
               } = ${money(precioDe(l) * l.qty)}`,
           ),
-          '',
-          `Total: ${money(total)} · ${count} ${count === 1 ? 'unidad' : 'unidades'}`,
-          '',
-          '¿Me pueden confirmar disponibilidad y envío? ¡Gracias!',
-        ].join('\n');
+          "",
+          `Total: ${money(total)} · ${count} ${count === 1 ? "unidad" : "unidades"}`,
+          "",
+          "¿Me pueden confirmar disponibilidad y envío? ¡Gracias!",
+        ].join("\n");
         wa.href = `${wa.dataset.base}?text=${encodeURIComponent(msg)}`;
-        wa.classList.remove('is-off');
+        wa.classList.remove("is-off");
       }
     }
 
-    const clear = q<HTMLButtonElement>('[data-clear]');
+    const clear = q<HTMLButtonElement>("[data-clear]");
     if (clear) clear.hidden = lineas.length === 0;
   }
 
-  const drawer = q<HTMLElement>('.drawer');
-  const scrim = q<HTMLElement>('.scrim');
-  const fab = q<HTMLButtonElement>('.fab');
+  const drawer = q<HTMLElement>(".drawer");
+  const scrim = q<HTMLElement>(".scrim");
+  const fab = q<HTMLButtonElement>(".fab");
 
   function abrir(on: boolean) {
     if (!drawer || !scrim || !fab) return;
-    drawer.classList.toggle('is-on', on);
-    scrim.classList.toggle('is-on', on);
-    drawer.setAttribute('aria-hidden', String(!on));
-    fab.setAttribute('aria-expanded', String(on));
-    document.documentElement.classList.toggle('cart-open', on);
-    if (on) q<HTMLButtonElement>('.x', drawer)?.focus();
+    drawer.classList.toggle("is-on", on);
+    scrim.classList.toggle("is-on", on);
+    drawer.setAttribute("aria-hidden", String(!on));
+    fab.setAttribute("aria-expanded", String(on));
+    document.documentElement.classList.toggle("cart-open", on);
+    if (on) q<HTMLButtonElement>(".x", drawer)?.focus();
   }
 
   /* ---------- eventos ---------- */
-  document.addEventListener('click', (e) => {
+  document.addEventListener("click", (e) => {
     const t = e.target as HTMLElement | null;
     if (!t) return;
 
-    const dec = t.closest<HTMLElement>('[data-dec]');
-    const inc = t.closest<HTMLElement>('[data-inc]');
-    const del = t.closest<HTMLElement>('[data-del]');
+    const dec = t.closest<HTMLElement>("[data-dec]");
+    const inc = t.closest<HTMLElement>("[data-inc]");
+    const del = t.closest<HTMLElement>("[data-del]");
 
     if (dec || inc || del) {
-      const i = Number((dec || inc || del)!.getAttribute('data-' + (dec ? 'dec' : inc ? 'inc' : 'del')));
+      const i = Number(
+        (dec || inc || del)!.getAttribute(
+          "data-" + (dec ? "dec" : inc ? "inc" : "del"),
+        ),
+      );
       const l = lineas[i];
       if (l) {
         if (del) lineas.splice(i, 1);
@@ -234,58 +267,59 @@ import { whatsappUrl } from '../data/site';
       return;
     }
 
-    if (t.closest('[data-clear]')) {
+    if (t.closest("[data-clear]")) {
       lineas = [];
       guardar();
       render();
       return;
     }
 
-    if (t.closest('[data-open]')) return abrir(true);
-    if (t.closest('[data-close]')) return abrir(false);
+    if (t.closest("[data-open]")) return abrir(true);
+    if (t.closest("[data-close]")) return abrir(false);
 
-    const add = t.closest<HTMLElement>('.card .add');
+    const add = t.closest<HTMLElement>(".card .add");
     if (add) {
-      const card = add.closest<HTMLElement>('.card');
+      const card = add.closest<HTMLElement>(".card");
       if (card) addDesdeCard(card);
       return;
     }
 
-    const fmt = t.closest<HTMLElement>('.card .fmt');
+    const fmt = t.closest<HTMLElement>(".card .fmt");
     if (fmt) {
-      const card = fmt.closest<HTMLElement>('.card');
+      const card = fmt.closest<HTMLElement>(".card");
       if (card) {
-        const fmts = Array.from(card.querySelectorAll<HTMLElement>('.fmt'));
+        const fmts = Array.from(card.querySelectorAll<HTMLElement>(".fmt"));
         card.dataset.sel = String(fmts.indexOf(fmt));
         pintarCard(card);
       }
       return;
     }
 
-    const step = t.closest<HTMLButtonElement>('.card .qty__btn');
+    const step = t.closest<HTMLButtonElement>(".card .qty__btn");
     if (step) {
-      const card = step.closest<HTMLElement>('.card');
+      const card = step.closest<HTMLElement>(".card");
       if (card) {
-        const qty = Number(card.dataset.qty || 1) + Number(step.dataset.step || 0);
+        const qty =
+          Number(card.dataset.qty || 1) + Number(step.dataset.step || 0);
         card.dataset.qty = String(Math.min(999, Math.max(1, qty)));
         pintarCard(card);
       }
     }
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') abrir(false);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") abrir(false);
   });
 
   /* ---------- arranque ---------- */
-  document.querySelectorAll<HTMLElement>('.card[data-name]').forEach((card) => {
-    if (!card.dataset.sel) card.dataset.sel = '0';
-    if (!card.dataset.qty) card.dataset.qty = '1';
+  document.querySelectorAll<HTMLElement>(".card[data-name]").forEach((card) => {
+    if (!card.dataset.sel) card.dataset.sel = "0";
+    if (!card.dataset.qty) card.dataset.qty = "1";
     pintarCard(card);
   });
 
-  const waInicial = q<HTMLAnchorElement>('[data-wa-link]');
-  if (waInicial) waInicial.dataset.base = waInicial.getAttribute('href') || '';
+  const waInicial = q<HTMLAnchorElement>("[data-wa-link]");
+  if (waInicial) waInicial.dataset.base = waInicial.getAttribute("href") || "";
   render();
 </script>
 
@@ -434,8 +468,8 @@ import { whatsappUrl } from '../data/site';
     display: grid;
     grid-template-columns: 1fr auto;
     grid-template-areas:
-      'txt qty'
-      'tot x';
+      "txt qty"
+      "tot x";
     gap: 8px;
     align-items: center;
   }
