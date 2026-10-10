@@ -10,6 +10,9 @@ export const site = {
 export const whatsappUrl = `https://wa.me/${site.whatsapp}`;
 export const mailUrl = `mailto:${site.email}`;
 
+/** Enlace de WhatsApp con el mensaje ya precargado. */
+export const waLink = (text: string) => `${whatsappUrl}?text=${encodeURIComponent(text)}`;
+
 /** Redes sociales oficiales. */
 export const social = [
   { name: 'Instagram', url: 'https://www.instagram.com/chontasabores0421' },

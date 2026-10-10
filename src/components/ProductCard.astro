@@ -1,40 +1,133 @@
 ---
 import type { Producto } from '../data/productos';
+import WhatsappIcon from './WhatsappIcon.astro';
+import { whatsappUrl } from '../data/site';
 
 interface Props {
   producto: Producto;
 }
 
 const { producto: p } = Astro.props;
+const first = p.formats[0];
 ---
 
-<article class="card" data-fx="pop">
+<article class="card" data-fx="pop" data-name={p.title} data-wa={whatsappUrl}>
   <div class="media" style={`background:${p.bg}`}>
     <img src={p.img} alt={p.alt} loading="lazy" />
   </div>
   <div class="body">
     <h3 class="display">{p.title}</h3>
     <p class="desc">{p.desc}</p>
-    <div class="prices">
+
+    <!-- Presentaciones: al elegir una se actualiza precio, total y mensaje -->
+    <div class="prices" role="group" aria-label={`Presentaciones de ${p.title}`}>
       {
-        p.formats.map((f) => (
-          <div>
-            <div class="row">
+        p.formats.map((f, k) => (
+          <button
+            type="button"
+            class="fmt"
+            data-size={f.size}
+            data-unit={f.unit}
+            data-mayor={f.mayor ?? ''}
+            aria-pressed={k === 0 ? 'true' : 'false'}
+          >
+            <span class="row">
               <span class="size">{f.size}</span>
               <span class="dots" />
               <span class="unit display">{f.unit}</span>
-            </div>
-            {f.mayor && (
-              <div class="tiers">
-                Por mayor desde 6 uds: {f.mayor} c/u
-              </div>
-            )}
-          </div>
+            </span>
+            {f.mayor && <span class="tiers">Por mayor desde 6 uds: {f.mayor} c/u</span>}
+          </button>
         ))
       }
     </div>
+
+    <!-- Pedido armado: cantidad + total + WhatsApp con el mensaje listo -->
+    <div class="order">
+      <div class="qty" role="group" aria-label="Cantidad de unidades">
+        <button type="button" class="qty__btn" data-step="-1" aria-label="Quitar una unidad">−</button>
+        <span class="qty__n" data-qty aria-live="polite">1</span>
+        <button type="button" class="qty__btn" data-step="1" aria-label="Añadir una unidad">+</button>
+      </div>
+
+      <div class="total">
+        <span class="total__label" data-mode>Precio unitario</span>
+        <strong class="total__val display" data-total>{first.unit}</strong>
+      </div>
+
+      <a class="btn order__cta" href={whatsappUrl} data-order target="_blank" rel="noopener noreferrer">
+        <WhatsappIcon size={17} />Pedir por WhatsApp
+      </a>
+    </div>
   </div>
 </article>
+
+<script>
+  const cop = new Intl.NumberFormat('es-CO');
+  const toNumber = (s: string) => parseInt(s.replace(/\D/g, ''), 10) || 0;
+
+  document.querySelectorAll<HTMLElement>('article.card[data-wa]').forEach((card) => {
+    const base = card.dataset.wa ?? '';
+    const nombre = card.dataset.name ?? '';
+    const fmts = Array.from(card.querySelectorAll<HTMLButtonElement>('.fmt'));
+    const qtyEl = card.querySelector<HTMLElement>('[data-qty]');
+    const totalEl = card.querySelector<HTMLElement>('[data-total]');
+    const modeEl = card.querySelector<HTMLElement>('[data-mode]');
+    const link = card.querySelector<HTMLAnchorElement>('[data-order]');
+    const steps = card.querySelectorAll<HTMLButtonElement>('.qty__btn');
+
+    if (!fmts.length || !qtyEl || !totalEl || !modeEl || !link) return;
+
+    let sel = 0;
+    let qty = 1;
+
+    const pintar = () => {
+      const f = fmts[sel];
+      const unitario0 = toNumber(f.dataset.unit ?? '');
+      const mayor = f.dataset.mayor ? toNumber(f.dataset.mayor) : 0;
+      const alPorMayor = mayor > 0 && qty >= 6;
+      const unitario = alPorMayor ? mayor : unitario0;
+      const total = unitario * qty;
+
+      qtyEl.textContent = String(qty);
+      totalEl.textContent = '$' + cop.format(total);
+      modeEl.textContent = alPorMayor ? 'Precio por mayor' : 'Precio unitario';
+      fmts.forEach((el, i) => el.setAttribute('aria-pressed', i === sel ? 'true' : 'false'));
+
+      const msg = [
+        '¡Hola, Chonta Sabores! 🌴',
+        'Quiero pedir desde su página:',
+        '',
+        `• Producto: ${nombre}`,
+        `• Presentación: ${f.dataset.size ?? ''}`,
+        `• Cantidad: ${qty} ${qty === 1 ? 'unidad' : 'unidades'}`,
+        `• Precio c/u: $${cop.format(unitario)}${alPorMayor ? ' (por mayor)' : ''}`,
+        `• Total: $${cop.format(total)}`,
+        '',
+        '¿Me pueden confirmar disponibilidad y envío? ¡Gracias!',
+      ].join('\n');
+
+      link.href = `${base}?text=${encodeURIComponent(msg)}`;
+    };
+
+    fmts.forEach((el, i) => {
+      el.addEventListener('click', () => {
+        sel = i;
+        pintar();
+      });
+    });
+
+    steps.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const d = Number(btn.dataset.step ?? 0);
+        qty = Math.min(999, Math.max(1, qty + d));
+        pintar();
+      });
+    });
+
+    pintar();
+  });
+</script>
 
 <style>
   .card {
@@ -98,10 +191,38 @@ const { producto: p } = Astro.props;
   .prices {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     margin-top: auto;
     padding-top: 6px;
   }
+
+  /* Cada presentación es un botón elegible */
+  .fmt {
+    appearance: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 6px;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .fmt:hover {
+    background: rgba(63, 30, 109, 0.06);
+  }
+  .fmt[aria-pressed='true'] {
+    border-color: rgba(42, 18, 48, 0.55);
+    background: rgba(247, 135, 69, 0.16);
+  }
+  .fmt:focus-visible {
+    outline: 3px solid var(--purple);
+    outline-offset: 2px;
+  }
+
   .row {
     display: flex;
     align-items: baseline;
@@ -110,6 +231,7 @@ const { producto: p } = Astro.props;
   .size {
     font-size: 13px;
     font-weight: 800;
+    white-space: nowrap;
   }
   .dots {
     flex: 1 1 20px;
@@ -120,6 +242,7 @@ const { producto: p } = Astro.props;
   .unit {
     font-size: 19px;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .tiers {
     font-size: 11.5px;
@@ -127,5 +250,84 @@ const { producto: p } = Astro.props;
     color: #6a4a70;
     font-variant-numeric: tabular-nums;
     margin-top: 2px;
+  }
+
+  /* Pedido: cantidad + total + CTA */
+  .order {
+    margin-top: 4px;
+    padding-top: 14px;
+    border-top: 2px dashed rgba(42, 18, 48, 0.3);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .qty {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .qty__btn {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    background: var(--kraft);
+    color: var(--ink);
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .qty__btn:hover {
+    background: var(--orange);
+  }
+  .qty__btn:focus-visible {
+    outline: 3px solid var(--purple);
+    outline-offset: -3px;
+  }
+  .qty__n {
+    min-width: 32px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .total {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+    margin-left: auto;
+    text-align: right;
+  }
+  .total__label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6a4a70;
+  }
+  .total__val {
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+  }
+  .order__cta {
+    flex: 1 1 100%;
+    background: var(--purple);
+    color: var(--paper);
+    min-height: 46px;
+    padding: 0 16px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card,
+    .media img {
+      transition: none !important;
+    }
   }
 </style>

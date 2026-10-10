@@ -222,6 +222,13 @@ function sections() {
     start: 'top 82%',
   });
 
+  // — Mayoristas / tiendas
+  reveal('#mayoreo .kicker', 'up', { trigger: '#mayoreo .title' });
+  revealWords('#mayoreo h2', { trigger: '#mayoreo .title' });
+  reveal('#mayoreo .lead', 'up', { trigger: '#mayoreo .title' });
+  reveal('#mayoreo .lista li', 'up', { trigger: '#mayoreo .lista', stagger: 0.1 });
+  reveal('#mayoreo .btn', 'up', { trigger: '#mayoreo .lista', start: 'top 92%' });
+
   // — Puntos de venta
   reveal('#puntos .kicker', 'up', { trigger: '#puntos .title' });
   revealWords('#puntos h2', { trigger: '#puntos .title' });
